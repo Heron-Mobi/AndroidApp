@@ -4,15 +4,11 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-
-
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
@@ -23,67 +19,52 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.Chal
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GenericHandler;
-import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
-
 import android.os.StrictMode;
 
 
 public class Cognito {
     // ############################################################# Information about Cognito Pool
 
-
-    private String identityPoolID;
-    private String clientSecret = "";
+    private Context mContext;
+    private String userPassword;                        // Used for Login
+    private CognitoUserPool userPool;
+    public CognitoCachingCredentialsProvider credentialsProvider;                        // Used for Login
+    private ConfigLoader config;
 
     private Regions awsRegions;
-
-    private String region;
-
-    // ############################################################# End of Information about Cognito Pool
-    private CognitoUserPool userPool;
-
-    private String userPoolID;
-    private Context appContext;
-    private String userPassword;                        // Used for Login
-
-    public CognitoCachingCredentialsProvider credentialsProvider;                        // Used for Login
-
     public String identityId;
 
-    public Cognito(Context context, String region, String userPoolID, String clientID, String identityPoolID){
-        this.identityPoolID = identityPoolID;
-        this.region = region;
-        this.userPoolID = userPoolID;
-        appContext = context;
-        awsRegions = Regions.fromName(region);         // Place your Region
-        //awsRegion = Region.getRegion(awsRegions);
-        userPool = new CognitoUserPool(context, userPoolID, clientID, clientSecret, awsRegions);
+    public Cognito(Context mContext, ConfigLoader config){
+        this.mContext = mContext;
+        awsRegions = Regions.fromName(config.region);
+        this.config = config;
+        userPool = new CognitoUserPool(mContext, config.userPoolID, config.clientID, config.clientSecret, awsRegions);
+        this.credentialsProvider = new CognitoCachingCredentialsProvider(mContext, config.identityPoolID, awsRegions);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-
         StrictMode.setThreadPolicy(policy);
     }
 
-
-
+    public void getCredentials(){
+        this.credentialsProvider.getCredentials();
+        identityId = this.credentialsProvider.getIdentityId();
+    }
     public void confirmUser(String userId, String code){
         CognitoUser cognitoUser =  userPool.getUser(userId);
         cognitoUser.confirmSignUpInBackground(code,false, confirmationCallback);
         //cognitoUser.confirmSignUp(code,false, confirmationCallback);
     }
-    // Callback handler for confirmSignUp API
     GenericHandler confirmationCallback = new GenericHandler() {
-
         @Override
         public void onSuccess() {
             // User was successfully confirmed
-            Toast.makeText(appContext,"User Confirmed", Toast.LENGTH_LONG).show();
+            Toast.makeText(mContext,"User Confirmed", Toast.LENGTH_LONG).show();
 
         }
-
         @Override
         public void onFailure(Exception exception) {
             // User confirmation failed. Check exception for the cause.
+            Toast.makeText(mContext,"User Login Failed", Toast.LENGTH_LONG).show();
 
         }
     };
@@ -102,14 +83,10 @@ public class Cognito {
         }
         @Override
         public void onSuccess(CognitoUserSession userSession, CognitoDevice newDevice) {
-            Toast.makeText(appContext,"Sign in success", Toast.LENGTH_LONG).show();
+            Toast.makeText(mContext,"Sign in success", Toast.LENGTH_LONG).show();
             String i = userSession.toString();
-            Log.i("user session", i);
-
-            credentialsProvider = new CognitoCachingCredentialsProvider(appContext, identityPoolID, awsRegions);
-
             Map<String, String> logins = new HashMap<String, String>();
-            String login = "cognito-idp."+ region +".amazonaws.com/"+ userPoolID;
+            String login = "cognito-idp."+ config.region +".amazonaws.com/"+ config.userPoolID;
             Log.i("login endpoint", login);
             logins.put(login, userSession.getIdToken().getJWTToken());
             credentialsProvider.setLogins(logins);
@@ -151,7 +128,7 @@ public class Cognito {
         @Override
         public void onFailure(Exception exception) {
             // Sign-in failed, check exception for the cause
-            Toast.makeText(appContext,"Sign in Failure", Toast.LENGTH_LONG).show();
+            Toast.makeText(mContext,"Sign in Failure", Toast.LENGTH_LONG).show();
         }
     };
     public class getID extends AsyncTask<CognitoCachingCredentialsProvider, Void, String> {
