@@ -1,6 +1,9 @@
 package com.example.heron;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Environment;
 
 import com.amazonaws.regions.Regions;
@@ -24,8 +27,13 @@ public class ConfigLoader {
     public String region;
     public String userPoolID;
     public String queue;
+    public String cognitouser;
 
     public void load(Context mContext) throws FileNotFoundException {
+        SharedPreferences prefs = mContext.getSharedPreferences("cognitouser", MODE_PRIVATE);
+        if (prefs.contains("name")) {
+            this.cognitouser = prefs.getString("name", "");
+        }
         File file = new File(
                 mContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
                 "config.json"

@@ -1,5 +1,7 @@
 package com.example.heron;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -46,6 +48,9 @@ public class Cognito {
     }
 
     public void getCredentials(){
+        String userId = this.config.cognitouser;
+        CognitoUser cognitoUser =  userPool.getUser(userId);
+        cognitoUser.getSession(authenticationHandler);
         this.credentialsProvider.getCredentials();
         identityId = this.credentialsProvider.getIdentityId();
     }
@@ -69,7 +74,8 @@ public class Cognito {
         }
     };
 
-    public void userLogin(String userId, String password){
+    public void userLogin(String password){
+        String userId = this.config.cognitouser;
         CognitoUser cognitoUser =  userPool.getUser(userId);
         this.userPassword = password;
         cognitoUser.getSession(authenticationHandler);

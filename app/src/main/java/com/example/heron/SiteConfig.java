@@ -3,6 +3,7 @@ package com.example.heron;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -43,6 +44,11 @@ public class SiteConfig extends AppCompatActivity {
         EditText email = findViewById(R.id.emailAddress);
         EditText password = findViewById(R.id.password);
         EditText domain = findViewById(R.id.configDomain);
+        SharedPreferences prefs = mContext.getSharedPreferences("cognitouser", MODE_PRIVATE);
+        if (prefs.contains("name")) {
+            email.setText(prefs.getString("name", ""));
+        }
+
         saveDomain.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 String configurl = "https://dashboard." + domain.getText().toString() + "/config.json";
@@ -53,6 +59,10 @@ public class SiteConfig extends AppCompatActivity {
 
         login.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                SharedPreferences pref = mContext.getSharedPreferences("cognitouser", MODE_PRIVATE);
+                SharedPreferences.Editor editor = pref.edit();
+                editor.putString("name",email.getText().toString());
+                editor.apply();
                 ConfigLoader config = new ConfigLoader();
                 try {
                     config.load(mContext);
@@ -63,7 +73,6 @@ public class SiteConfig extends AppCompatActivity {
                 }
                 Cognito cognito = new Cognito(mContext, config);
                 cognito.userLogin(
-                        email.getText().toString(),
                         password.getText().toString()
                 );
                 cognito.getCredentials();
