@@ -1,4 +1,4 @@
-package com.example.heron;
+package mobi.heron;
 
 import android.content.Context;
 import android.content.Intent;

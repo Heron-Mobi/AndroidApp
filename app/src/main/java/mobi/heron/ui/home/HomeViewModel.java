@@ -1,4 +1,4 @@
-package com.example.heron.ui.home;
+package mobi.heron.ui.home;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

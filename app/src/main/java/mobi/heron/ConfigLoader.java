@@ -1,4 +1,4 @@
-package com.example.heron;
+package mobi.heron;
 
 import static android.content.Context.MODE_PRIVATE;
 

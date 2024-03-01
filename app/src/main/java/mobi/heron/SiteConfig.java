@@ -1,4 +1,4 @@
-package com.example.heron;
+package mobi.heron;
 
 
 import android.content.Context;
@@ -14,7 +14,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.heron.databinding.ActivityMainBinding;
+import mobi.heron.databinding.ActivityMainBinding;
 import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

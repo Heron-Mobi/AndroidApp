@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:paddingTop="?attr/actionBarSize"
     android:keepScreenOn="true"
-    tools:context="com.example.heron.SiteConfig"
+    tools:context="mobi.heron.SiteConfig"
 
     >
 

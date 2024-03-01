@@ -1,4 +1,4 @@
-package com.example.heron.ui.home;
+package mobi.heron.ui.home;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,8 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.heron.R;
-import com.example.heron.databinding.FragmentHomeBinding;
+import mobi.heron.R;
+import mobi.heron.databinding.FragmentHomeBinding;
 
 public class HomeFragment extends Fragment {
 

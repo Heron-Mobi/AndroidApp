@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.heron'
+    namespace 'mobi.heron'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.example.heron"
+        applicationId "mobi.heron"
         minSdk 26
         targetSdk 34
         versionCode 1
